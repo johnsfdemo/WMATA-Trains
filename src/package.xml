@@ -10,9 +10,5 @@
         <members>WMATATrainPredictions</members>
         <name>AuraDefinitionBundle</name>
     </types>
-    <types>
-        <members>Google_Maps</members>
-        <name>CspTrustedSite</name>
-    </types>
     <version>45.0</version>
 </Package>

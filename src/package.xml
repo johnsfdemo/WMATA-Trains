@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WMATA Train Predictions</fullName>
+    <description>Lightning component and associated metadata for showing train schedules for the Washington Metropolitan Area Transit Authority (WMATA, also known as Metrorail). Also shows any alerts and delays in the system.</description>
+    <types>
+        <members>WMATAController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>WMATATrainPredictions</members>
+        <name>AuraDefinitionBundle</name>
+    </types>
+    <types>
+        <members>Google_Maps</members>
+        <name>CspTrustedSite</name>
+    </types>
+    <version>45.0</version>
+</Package>

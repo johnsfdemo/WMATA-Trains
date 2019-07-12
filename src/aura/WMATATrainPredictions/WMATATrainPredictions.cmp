@@ -1,0 +1,113 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="WMATAController">
+    
+    <aura:attribute name="metroAPIKey" type="String" required="true" default="d1997b5614754f30b88ca19b3b015f6f" />
+    <aura:attribute name="cardTitle" type="String" default="Washington Metrorail" />
+    
+    <aura:attribute name="cardHeader" type="Aura.Component[]" access="private">
+        <div class="slds-text-heading_small slds-text-title_bold">
+            {!v.cardTitle}
+        </div>
+    </aura:attribute>   
+    <aura:attribute name="stations" type="List" access="private" />
+    <aura:attribute name="selectedStation" type="String" default="None" access="private" />
+    <aura:attribute name="allTrains" type="List" access="private" />
+    <aura:attribute name="trainList" type="List" default="[]" access="private" />
+    <aura:attribute name="metroIncidents" type="List" access="private" />
+    <aura:attribute name="trainsVisibility" type="Boolean" default="false" access="private" />
+    <aura:attribute name="incidentsVisibility" type="Boolean" default="false" access="private" />
+    <aura:attribute name="incidentsButtonVisibility" type="Boolean" default="false" access="private" />
+    <aura:attribute name="flexRegionWidth" type="String" />
+    
+    <lightning:flexipageRegionInfo width="{!v.flexRegionWidth}"/>				<!-- SMALL, MEDIUM, LARGE, and XLARGE -->
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />    
+    
+    <lightning:card title="{!v.cardHeader}" iconName="custom:custom36">
+        
+        <lightning:layout multipleRows="false" verticalAlign="end">
+            <lightning:layoutItem padding="around-small" size="9">
+                <lightning:select aura:id="stationList" value="{!v.selectedStation}" label="Please select a departure station."
+                                  required="true" onchange="{!c.handleStationSelect}">
+                    <option text="Select a Train Station ..." value="None" selected="true" />
+                    <aura:iteration items="{!v.stations}" var="station">
+                        <option text="{!station.LocationName}" value="{!station.LocationCode}" />
+                    </aura:iteration>            
+                </lightning:select>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="3">
+                <lightning:button variant="brand" label="Show" title="Show the list of incoming trains" onclick="{!c.handleShowButton}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+        
+        <lightning:layout class="{!v.trainsVisibility ? 'slds-show' : 'slds-hide'}" horizontalAlign="center" multipleRows="true">
+            <aura:if isTrue="{!not(empty(v.trainList))}">
+                <lightning:layoutItem padding="horizontal-small" size="12">
+                    <table width="100%" class="slds-p-horizontal_small">
+                        <thead class="slds-border_top slds-border_bottom">
+                            <td class="table-small-width slds-text-title_bold"> Minutes </td>
+                            <td class="table-small-width slds-text-title_bold"> Line </td>
+                            <td class="table-small-width slds-text-title_bold"> Cars </td>
+                            <td class="slds-text-title_bold"> Direction </td>
+                        </thead>
+                        <tbody class="slds-border_bottom">
+                            <aura:iteration items="{!v.trainList}" var="train">
+                                <tr>
+                                    <td> <span class="{!lessthanorequal(train.Min,5) || train.Min == 'ARR' || train.Min == 'BRD' ? 'slds-text-color_error' : 'slds-text-color_success'}">{!train.Min}</span> </td>
+                                    <td class="{!'slds-text-title_bold color-' + train.Line}"> {!train.Line} </td>
+                                    <td> {!train.Car} </td>
+                                    <td> <span class="slds-truncate">{!train.DestinationName}</span> </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layoutItem>
+                <aura:set attribute="else">
+                    <p class="slds-p-horizontal_small">
+                        No trains are arriving soon. Please check back later.
+                    </p>
+                </aura:set>
+            </aura:if>
+        </lightning:layout>
+        
+        <lightning:layout horizontalAlign="center" multipleRows="true">
+            <lightning:layoutItem padding="around-small" size="6">
+                <lightning:button class="slds-align_absolute-center" disabled="{!not(v.incidentsButtonVisibility)}"
+                                  variant="neutral" label="{!(v.incidentsVisibility ? 'Hide' : 'Show') + ' Incidents'}" onclick="{!c.handleIncidentsButton}" />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="6">
+                <lightning:button class="slds-align_absolute-center" variant="neutral" label="Refresh Train Info" onclick="{!c.handleRefreshButton}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+
+        <lightning:layout class="{!v.incidentsVisibility ? 'slds-show' : 'slds-hide'}" multipleRows="true">
+            <aura:if isTrue="{!not(empty(v.metroIncidents))}">
+                <aura:iteration items="{!v.metroIncidents}" var="incident">
+                    <lightning:layoutItem padding="around-medium" size="{!v.flexRegionWidth == 'SMALL' ? 12 : 4}"
+                                          class="slds-has-dividers_around-space slds-p-horizontal_medium slds-p-bottom_xx-small">
+                        <lightning:tile label="{!incident.IncidentType}" href="https://www.wmata.com/service/status/">
+                            <aura:set attribute="media">
+                                <lightning:icon iconName="{!(incident.IncidentType == 'Alert') ? 'action:announcement' : 'action:info'}" size="xx-small" />
+                            </aura:set>
+                            <aura:if isTrue="{!not(empty(incident.lines))}">
+                                <p class="slds-truncate">
+                                    <aura:iteration items="{!incident.lines}" var="line">
+                                        <span class="slds-text-title_bold" style="{!'color: ' + line.lineColor}">{!line.lineName}</span> &nbsp;
+                                    </aura:iteration>
+                                </p>
+                            </aura:if>
+                            <p>{!incident.Description}</p>
+                        </lightning:tile>
+                    </lightning:layoutItem>
+                </aura:iteration>
+                <aura:set attribute="else">
+                    <lightning:layoutItem>
+                        <p>No incidents currently reported.</p>
+                    </lightning:layoutItem>
+                </aura:set>
+            </aura:if>
+        </lightning:layout>
+        
+    </lightning:card>
+    
+</aura:component>

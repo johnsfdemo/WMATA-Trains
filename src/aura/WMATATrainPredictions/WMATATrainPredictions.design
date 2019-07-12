@@ -1,0 +1,7 @@
+<design:component label="WMATA Trains">
+    <design:attribute name="metroAPIKey" label="WMATA API Key" description="A required API Key from the WMATA website." />
+    <design:supportedFormFactors>
+        <design:supportedFormFactor type="Large"/>
+        <design:supportedFormFactor type="Small"/>
+    </design:supportedFormFactors>	
+</design:component>

@@ -1,0 +1,39 @@
+.THIS {
+}
+
+.THIS .table-small-width {
+    width: 3em;
+}
+.THIS td {
+    display: table-cell;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: center;
+    white-space: wrap;
+    vertical-align: middle;
+}
+
+.THIS .color-RD {
+    background-color: #e51736;
+    color: white;
+}
+.THIS .color-OR {
+    background-color: #f7931d;
+    color: white;
+}
+.THIS .color-YL {
+    background-color: #fdd107;
+    color: black;
+}
+.THIS .color-GR {
+    background-color: #02a84e;
+    color: white;
+}
+.THIS .color-SV {
+    background-color: #9fa3a1;
+    color: white;
+}
+.THIS .color-BL {
+    background-color: #0077c0;
+    color: white;
+}
